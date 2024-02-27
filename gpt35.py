@@ -1,8 +1,12 @@
-import openai
 import os
+from openai import OpenAI
+from dotenv import load_dotenv
 
-# Load your API key from an environment variable or secret management service
-openai.api_key = os.getenv("OPENAI_API_KEY")
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.environ.get("my_key"),
+)
 
 def chatbot():
   # Create a list to store all the messages for context
@@ -10,25 +14,19 @@ def chatbot():
     {"role": "system", "content": "You are a helpful assistant."},
   ]
 
-  # Keep repeating the following
   while True:
-    # Prompt user for input
     message = input("User: ")
 
-    # Exit program if user inputs "quit"
     if message.lower() == "quit":
       break
 
-    # Add each new message to the list
     messages.append({"role": "user", "content": message})
 
-    # Request gpt-3.5-turbo for chat completion
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
       model="gpt-3.5-turbo",
       messages=messages
     )
 
-    # Print the response and add it to the messages list
     chat_message = response['choices'][0]['message']['content']
     print(f"Bot: {chat_message}")
     messages.append({"role": "assistant", "content": chat_message})
